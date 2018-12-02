@@ -6,7 +6,7 @@ function Atman(id, x, y){
   this.y = y;
 }
 
-
+/* shiffman heroku set up
 var express = require('express');
 var app = express();
 
@@ -26,6 +26,21 @@ app.use(express.static('public'));
 console.log('Socket server running');
 
 var io = require('socket.io')(server);
+*/
+
+//heroku tutorial
+const express = require('express');
+const socketIO = require('socket.io');
+const path = require('path');
+
+const PORT = process.env.PORT || 3000;
+const INDEX = path.join(__dirname, 'sketch.js');
+
+const server = express()
+  .use((req, res) => res.sendFile(INDEX))
+  .listen(PORT, () => console.log('Listening on ${PORT}'));
+
+const io = socketIO(server);
 
 setInterval(heartbeat, 33);
 function heartbeat(){ //so this is the only thing sent from server???
