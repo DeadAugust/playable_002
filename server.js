@@ -27,6 +27,7 @@ console.log('Socket server running');
 
 var io = require('socket.io')(server);
 */
+/*
 // stack overflow set up
 var express = require('express'),
   http = require('http');
@@ -39,7 +40,7 @@ server.listen(process.env.PORT || 3000);
 app.use(express.static('public'));
 
 console.log('Socket server running');
-
+*/
 
 /*heroku tutorial
 const express = require('express');
@@ -55,6 +56,19 @@ const server = express()
 
 const io = socketIO(server);
 */
+
+//socket.io set up tutorial
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+var port = process.env.PORT || 3000;
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/index.html')
+});
+
+http.listen(port, function(){
+  console.log('listening on ' + port);
+})
 
 setInterval(heartbeat, 33);
 function heartbeat(){ //so this is the only thing sent from server???
