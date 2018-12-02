@@ -1,4 +1,4 @@
-var socket = io();
+var socket;
 
 var atman;
 var atmans = [];
@@ -7,7 +7,7 @@ function setup() {
 	createCanvas(400, 400);
 	background(0,100,100);
 
-	//socket = io.connect('http://localhost:3000'); //this has to be the issue
+	socket = io.connect('http://localhost:80'); //this has to be the issue
 //set up with socket.id?
 	atman = new Atman (socket.id, random(50, width - 50), random(50, height-50));
 

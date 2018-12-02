@@ -6,14 +6,14 @@ function Atman(id, x, y){
   this.y = y;
 }
 
-/* shiffman heroku set up
+// shiffman heroku set up
 var express = require('express');
 var app = express();
 
 //var server = app.listen(3000);
 
 //for heroku
-var server = app.listen(process.env.PORT || 3000, listen);
+var server = app.listen(process.env.PORT || 80, listen);
 
 function listen() {
   var host = server.address().address;
@@ -26,9 +26,9 @@ app.use(express.static('public'));
 console.log('Socket server running');
 
 var io = require('socket.io')(server);
-*/
 
-//heroku tutorial
+
+/*heroku tutorial
 const express = require('express');
 const socketIO = require('socket.io');
 const path = require('path');
@@ -41,6 +41,7 @@ const server = express()
   .listen(PORT, () => console.log('Listening on ${PORT}'));
 
 const io = socketIO(server);
+*/
 
 setInterval(heartbeat, 33);
 function heartbeat(){ //so this is the only thing sent from server???
