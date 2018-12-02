@@ -10,7 +10,16 @@ function Atman(id, x, y){
 var express = require('express');
 var app = express();
 
-var server = app.listen(3000);
+//var server = app.listen(3000);
+
+//for heroku
+var server = app.listen(process.env.PORT || 3000, listen);
+
+function listen() {
+  var host = server.address().address;
+  var port = server.address().port;
+  console.log('Example app listening at http://' + host + ':' + port);
+}
 
 app.use(express.static('public'));
 
@@ -18,7 +27,6 @@ console.log('Socket server running');
 
 var io = require('socket.io')(server);
 
-//heartbeat needed?
 setInterval(heartbeat, 33);
 function heartbeat(){ //so this is the only thing sent from server???
   io.sockets.emit('heartbeat', atmans);
