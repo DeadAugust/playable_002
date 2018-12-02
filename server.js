@@ -5,68 +5,15 @@ function Atman(id, x, y){
   this.x = x;
   this.y = y;
 }
-/*
-// shiffman heroku set up
-var express = require('express');
-var app = express();
 
-//var server = app.listen(3000);
-
-//for heroku
-var server = app.listen(process.env.PORT || 80, listen);
-
-function listen() {
-  var host = server.address().address;
-  var port = server.address().port;
-  console.log('Example app listening at http://' + host + ':' + port);
-}
-
-app.use(express.static('public'));
-
-console.log('Socket server running');
-
-var io = require('socket.io')(server);
-*/
-/*
-// stack overflow set up
-var express = require('express'),
-  http = require('http');
-var app = express();
-var server = http.createServer(app);
-var io = require('socket.io').listen(server);
-
-server.listen(process.env.PORT || 3000);
-
-app.use(express.static('public'));
-
-console.log('Socket server running');
-*/
-
-/*heroku tutorial
-const express = require('express');
-const socketIO = require('socket.io');
-const path = require('path');
-
-const PORT = process.env.PORT || 3000;
-const INDEX = path.join(__dirname, 'sketch.js');
-
-const server = express()
-  .use((req, res) => res.sendFile(INDEX))
-  .listen(PORT, () => console.log('Listening on ${PORT}'));
-
-const io = socketIO(server);
-*/
-
-//socket.io set up tutorial
-// var app = require('express')();
+// shiffman heroku set up &&
+// socket.io set up tutorial
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
-// app.get('/', function(req, res){
-//   res.sendFile(__dirname + '/public/index.html')
-// });
+
 app.use(express.static('public'));
 
 
