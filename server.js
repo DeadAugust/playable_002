@@ -5,7 +5,7 @@ function Atman(id, x, y){
   this.x = x;
   this.y = y;
 }
-
+/*
 // shiffman heroku set up
 var express = require('express');
 var app = express();
@@ -26,6 +26,19 @@ app.use(express.static('public'));
 console.log('Socket server running');
 
 var io = require('socket.io')(server);
+*/
+// stack overflow set up
+var express = require('express'),
+  http = require('http');
+var app = express();
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);
+
+server.listen(process.env.PORT || 3000);
+
+app.use(express.static('public'));
+
+console.log('Socket server running');
 
 
 /*heroku tutorial
