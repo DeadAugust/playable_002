@@ -10,7 +10,7 @@ function Atman(id, x, y, name, r, g, b){
   this.g = g;
   this.b = b;
 }
- /* uncomment for heroku
+ // uncomment for heroku
 // shiffman heroku set up &&
 // socket.io set up tutorial
 var express = require('express');
@@ -25,8 +25,8 @@ app.use(express.static('public'));
 http.listen(port, function(){
   console.log('listening on ' + port);
 })
-*/
 
+/*
 //for local dev
 var express = require('express');
 var app = express();
@@ -38,7 +38,7 @@ app.use(express.static('public'));
 console.log('Socket server running');
 
 var io = require('socket.io')(server);
-
+*/
 setInterval(heartbeat, 33);
 function heartbeat(){ //so this is the only thing sent from server???
   io.sockets.emit('heartbeat', atmans);
