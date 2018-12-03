@@ -10,7 +10,7 @@ function Atman(id, x, y, name, r, g, b){
   this.g = g;
   this.b = b;
 }
- // uncomment for heroku
+//for heroku
 // shiffman heroku set up &&
 // socket.io set up tutorial
 var express = require('express');
@@ -39,6 +39,7 @@ console.log('Socket server running');
 
 var io = require('socket.io')(server);
 */
+
 setInterval(heartbeat, 33);
 function heartbeat(){ //so this is the only thing sent from server???
   io.sockets.emit('heartbeat', atmans);
@@ -85,16 +86,15 @@ io.sockets.on('connection',
         }
       }
     );
-    /* msg test
-    socket.on('msg',
-      function(data){
-        socket.broadcast.to(data.idTo).emit('msg', data);
-        console.log(data);
-      }
-    );
-    */
     socket.on('disconnect',
       function(data){
+        var atman;
+        for (var i = 0; i < atmans.length; i++){
+          if (socket.id == atmans[i].id){
+            atmans.splice(i, 1);
+          }
+        }
+
         console.log("Client has disconnected");
       })
   })

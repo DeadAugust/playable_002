@@ -35,17 +35,17 @@ var mork4u = 0;
 var upple4u = 0;
 //debounce
 var oneTrade = true; //trade debounce;
-// var getOne; //trade debounce?
 var tradeTime = 1000;// for trade
-// var thisTime = 100;//for button
 var lastTrade = 0;
-// var lastTime = 0;
 var debounce = 500;
 
+//- - - - - - - - map
+var slots = []; //nested array?
+
 function setup(){
-	// console.log('test');
 	//- - - - - overall
-	var canvas = createCanvas(400, 600);
+	var screenSize = windowHeight - 100;
+	var canvas = createCanvas(int(screenSize * .666), screenSize);
  	canvas.parent('myCanvas');
 	// bgColor = color(0, 150, 50); //should have same bg I guess
 	background(0, 150, 50);
@@ -74,6 +74,16 @@ function setup(){
 	submit.position(3* width/4, 5 * height / 7);
 	submit.mousePressed(playerName);
 
+	//map slots -- 20
+	for (var y = 0; y < 5; y++){
+		slots[y] = [];
+		for (var x = 0; x < 4; x ++){
+			slots[y][x] = {
+				x: x * width/5,
+				y: y * height/6
+			}
+		}
+	}
 
 	// - - - - - heartbeat
 	socket.on('heartbeat',
@@ -134,7 +144,7 @@ function draw() {
 	}
 	else{ //- - - - - after setup
 		// startButt.hide();
-		background(0, 150, 50);
+		background(0, 150, 50); //where can I put this?
 		//update map
 		for (var i = atmans.length - 1; i >= 0; i--){
 			var id = atmans[i].id;
@@ -186,58 +196,49 @@ function draw() {
 					mork += data.idMork;
 					upple += data.idUpple;
 					console.log('trade from ' + data.nameFrom);
+					stroke(0, 200);
+					strokeWeight(2);
+					fill(255, 200);
+					textSize(22);
+					if (data.idTato == 1){ //make individual functions, toggle, loop text
+						text(data.nameFrom + " sent you a Tato", width/2, height/2);
+					}
+					else if (data.idMork == 1){
+						text(data.nameFrom + " sent you some Mork", width/2, height/2);
+					}
+					else{
+						text(data.nameFrom + " sent you an upple", width/2, height/2);
+					}
 					buttonRefresh();
 					lastTrade = tradeTime;
 				}
 			}
 		);
-		/*
-		socket.on('msg',
-			function (data){
-				console.log('msg from: ' + data.idFrom);
-			}
-		);
-		*/
 	}
 }
 
-function mousePressed(){ //can i make mousePressed an Atman method thing?
-	/*
-	if((mouseX >= atman.x - 40) && (mouseX <= atman.x + 40)
-    && (mouseY >= atman.y - 40) && (mouseY <= atman.y + 40)){
-      clearTrade();
-  }
-	*/
-	console.log('trade fud:');
-	console.log(tradeFud);
-	console.log("trade target:");
-	console.log(tradeTarget);
-	console.log('tradebutt:');
-	console.log(tradeButt);
-	for (var i = atmans.length - 1; i >=0; i--){ //click to send msg
-		if((mouseX >= atmans[i].x - 30) && (mouseX <= atmans[i].x + 30)
-			&& (mouseY >= atmans[i].y - 30) && (mouseY <= atmans[i].y + 30)){
-				//clearTrade();
-				// if(!atmans[i].select){ //if unselected, select
+function mousePressed(){
+	// console.log(slots);
+	for (var i = atmans.length - 1; i >=0; i--){
+		if((mouseX >= atmans[i].x - 20) && (mouseX <= atmans[i].x + 20)
+			&& (mouseY >= atmans[i].y - 20) && (mouseY <= atmans[i].y + 20)){
 					tradeTarget = atmans[i].name;
 					tradeId = atmans[i].id;
 					console.log(tradeId);
+		}
+	}
+	// background(0, 150, 50); //where can I put this?
+}
 
-				// }
-				// else{ //if selected, unselect
-				// 	// atmans[i].select = false;
-				// 	tradeTarget = ' ';
-				// }
-				// fill(255,255,0);
-				// ellipse(atmans[i].x, atmans[i].y, 40, 40);
-
-				/* msg test
-				var data = {
-					idTo: atmans[i].id,
-					idFrom: socket.id
-				}
-				socket.emit('msg', data);
-				*/
+function mouseDragged(){
+//need to toggle so only during game, not setup?
+	for (var i = atmans.length -1; i >= 0; i--){ //could be fun if they're repelling away from items
+		if (socket.id !== atmans[i].id){
+			if (dist(mouseX, mouseY, atmans[i].x, atmans[i].y) > 100){
+				atman.x = mouseX;
+				atman.y = mouseY;
+				atman.show();
+			}
 		}
 	}
 }
@@ -318,7 +319,6 @@ function newPlayer(){
 }
 
 function trade(){
-	// if (!oneTrade){
 	tato -= tato4u;
 	mork -= mork4u;
 	upple -= upple4u;
@@ -332,6 +332,20 @@ function trade(){
 		idUpple: upple4u
 	}
 	socket.emit('trade', data);
+	console.log(data.idTato, data.idMork, data.idUpple);
+	stroke(0, 200);
+	strokeWeight(2);
+	fill(255, 200);
+	textSize(22);
+	if (data.idTato == 1){
+		text("You sent " + data.nameTo + " a tato", width/2, height/2);
+	}
+	else if (data.idMork == 1){
+		text("You sent " + data.nameTo + " some mork", width/2, height/2);
+	}
+	else{
+		text("You sent " + data.nameTo + " an upple", width/2, height/2);
+	}
 	resetTrade();
 	// }
 }
