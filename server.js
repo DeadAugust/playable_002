@@ -10,7 +10,7 @@ function Atman(id, x, y, name, r, g, b){
   this.g = g;
   this.b = b;
 }
-//for heroku
+ // uncomment for heroku
 // shiffman heroku set up &&
 // socket.io set up tutorial
 var express = require('express');
@@ -39,15 +39,48 @@ console.log('Socket server running');
 
 var io = require('socket.io')(server);
 */
+//new
+// app.get('/sample', function(req,res){
+//   res.send('this sampless');
+// });
+/*
+var router = express.Router();
+
+router.get('/', function(req, res){
+  res.sendFile('/sketch.js');
+});
+
+router.get('/sharedScreen', function(req,res){
+  res.sendFile('/sharedScreen.js');
+});
+
+app.use('/',router);
+*/
+
+var path = require('path');
+
+app.get('/', function(req, res){
+  res.sendFile(path.join(__dirname + '/public/index.html'));
+});
+
+app.get('/sharedScreen', function(req,res){
+  res.sendFile(path.join(__dirname + '/public/sharedIndex.html'));
+});
 
 setInterval(heartbeat, 33);
 function heartbeat(){ //so this is the only thing sent from server???
   io.sockets.emit('heartbeat', atmans);
 }
 
+//
+var startGame = false; //whether or not game has started
+// var time
+
+
 io.sockets.on('connection',
   function(socket){
     console.log("new player: " + socket.id);
+
     socket.on('start',
       function(data){
         var atman = new Atman(socket.id, data.x, data.y, data.name, data.r, data.g, data.b);
@@ -55,6 +88,12 @@ io.sockets.on('connection',
         console.log(atmans);
       }
     );
+
+    socket.on('startGame',
+      function(){
+        startGame = true;
+        console.log(startGame);
+      })
 
     socket.on('update', //x undefined error from being first to party?
       function(data){

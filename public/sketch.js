@@ -24,6 +24,8 @@ var tradeId; //player's id
 var tradeFud = ' '; // item selected
 // var tradeCan = false; //if both above are true, can trade
 var tradeButt; //trade button
+var tradeMsg = false; //for msg overlay
+var lastTrader; //person last traded with
 var tatos, morks, upples; //fud buttons
 //fud item containers
 var tato = 0;
@@ -38,6 +40,7 @@ var oneTrade = true; //trade debounce;
 var tradeTime = 1000;// for trade
 var lastTrade = 0;
 var debounce = 500;
+
 
 //- - - - - - - - map
 var slots = []; //nested array?
@@ -145,6 +148,14 @@ function draw() {
 	else{ //- - - - - after setup
 		// startButt.hide();
 		background(0, 150, 50); //where can I put this?
+		if (tradeMsg){
+			stroke(255);
+			strokeWeight(2);
+			textSize(24);
+			fill(0);
+			text("You traded with " + lastTrader, width/2, height/2);
+		}
+		console.log(tradeMsg);
 		//update map
 		for (var i = atmans.length - 1; i >= 0; i--){
 			var id = atmans[i].id;
@@ -211,6 +222,8 @@ function draw() {
 					}
 					buttonRefresh();
 					lastTrade = tradeTime;
+					tradeMsg = true;
+					lastTrader = data.nameFrom;
 				}
 			}
 		);
@@ -222,12 +235,14 @@ function mousePressed(){
 	for (var i = atmans.length - 1; i >=0; i--){
 		if((mouseX >= atmans[i].x - 20) && (mouseX <= atmans[i].x + 20)
 			&& (mouseY >= atmans[i].y - 20) && (mouseY <= atmans[i].y + 20)){
-					tradeTarget = atmans[i].name;
-					tradeId = atmans[i].id;
-					console.log(tradeId);
+					tradeMsg = false;
+					if (atmans[i].id !== socket.id){
+						tradeTarget = atmans[i].name;
+						tradeId = atmans[i].id;
+						// console.log(tradeId);
+					}
 		}
 	}
-	// background(0, 150, 50); //where can I put this?
 }
 
 function mouseDragged(){
@@ -347,7 +362,8 @@ function trade(){
 		text("You sent " + data.nameTo + " an upple", width/2, height/2);
 	}
 	resetTrade();
-	// }
+	tradeMsg = true;
+	lastTrader = data.nameTo;
 }
 
 // function showTrade(){
