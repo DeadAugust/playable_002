@@ -261,6 +261,7 @@ function startGame(){
   console.log('sent');
   startTime = true;
   timer = millis();
+  startButton.remove();
 }
 
 function spawnFud(){
