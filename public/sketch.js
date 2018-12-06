@@ -2,8 +2,10 @@ var socket = io();
 
 var atman;
 var atmans = [];
+var mapTiles = [];
+var freeFud = [];
 
-var bgColor;
+// var bgColor;
 //- - - - - player setup
 var input, submit, redSlide, greenSlide, blueSlide, colorChoose, startButt;
 var name = ' ';
@@ -40,10 +42,16 @@ var tradeTime = 1000;// for trade
 var lastTrade = 0;
 var debounce = 500;
 
+var tatoCol;
+var morkCol;
+var uppleCol;
+
+var triScale = 20; //fud triangle scaling
 
 //- - - - - - - - map
-var slots = []; //nested array?
+// var slots = []; //nested array?
 
+var upButt, downButt, leftButt, rightButt; //movement
 //- - - - - - - - game over
 var gameOver = false; //if time's up
 
@@ -77,22 +85,40 @@ function setup(){
 	submit.parent('myCanvas');
 	submit.position(3* width/4, 5 * height / 7);
 	submit.mousePressed(playerName);
+	upButt = createButton('up');
+	upButt.parent('myCanvas');
+	upButt.hide(); //create so not undefined in function later
+	downButt = createButton('down');
+	downButt.parent('myCanvas');
+	downButt.hide();
+	leftButt = createButton('left');
+	leftButt.parent('myCanvas');
+	leftButt.hide();
+	rightButt = createButton('right');
+	rightButt.parent('myCanvas');
+	rightButt.hide();
+
+	var tatoCol = color(255,253,0,50);
+	var morkCol = color(0,51,153,50);
+	var uppleCol = color(179,0,89,50);
 
 	//map slots -- 20
-	for (var y = 0; y < 5; y++){
-		slots[y] = [];
-		for (var x = 0; x < 4; x ++){
-			slots[y][x] = {
-				x: x * width/5,
-				y: y * height/6
-			}
-		}
-	}
+	// for (var y = 0; y < 5; y++){
+	// 	slots[y] = [];
+	// 	for (var x = 0; x < 4; x ++){
+	// 		slots[y][x] = {
+	// 			x: x * width/5,
+	// 			y: y * height/6
+	// 		}
+	// 	}
+	// }
 
 	// - - - - - heartbeat
 	socket.on('heartbeat',
 		function(data){
-			atmans = data;
+			atmans = data.atmans;
+			mapTiles = data.mapTiles;
+			// freeFud = data.freeFud;
 		}
 	);
 }
@@ -138,13 +164,18 @@ function draw() {
 				upple++;
 			}
 		}
+		//color not working yet, save til later
 		tatos = createButton('tatos: ' + tato);
+		tatos.style('background-color', tatoCol);
 		tatos.mousePressed(tradeTato);
 		morks = createButton('morks: ' + mork);
+		morks.style('background-color', morkCol);
 		morks.mousePressed(tradeMork);
 		upples = createButton('upples:' + upple);
+		upples.style('background-color', uppleCol);
 		upples.mousePressed(tradeUpple);
 		gameSetup = true;
+		moveButtons();
 	}
 	else if(gameOver){
 		background(100, 0, 40);
@@ -153,7 +184,8 @@ function draw() {
 		text('times up!', width/2, height/2);
 	}
 	else{ //- - - - - after setup, main game
-		background(0, 150, 50); //where can I put this?
+		// background(0, 150, 50); //where can I put this?
+		background(mapTiles[atman.tile].r,mapTiles[atman.tile].g,mapTiles[atman.tile].b)
 		if (tradeMsg){
 			stroke(255);
 			strokeWeight(2);
@@ -165,7 +197,7 @@ function draw() {
 		//update map
 		for (var i = atmans.length - 1; i >= 0; i--){
 			var id = atmans[i].id;
-			if (id !== socket.id){
+			if ((id !== socket.id)&&(atman.tile == atmans[i].tile)){
 				noStroke();
 				fill(atmans[i].r, atmans[i].g, atmans[i].b);
 				ellipse(atmans[i].x, atmans[i].y, 30, 30);
@@ -181,22 +213,38 @@ function draw() {
 			}
 		}
 		atman.show();
-		textSize(18);
-		if (((atman.r + atman.g + atman.b) / 3) < 100){
-			fill(255);
+		meName();
+		// textSize(18);
+		// if (((atman.r + atman.g + atman.b) / 3) < 100){
+		// 	fill(255);
+		// }
+		// else {
+		// 	fill(0);
+		// }
+		// noStroke();
+		// text('me', atman.x, atman.y + 5);
+
+		//fud pick up and map display
+		console.log(freeFud);
+		for(var i = freeFud.length -1; i >= 0; i--){
+			if(freeFud[i].tile == atman.tile){
+				// freeFud[i].show();
+				noStroke();
+				fill(freeFud[i].r, freeFud[i].g, freeFud[i].b);
+				ellipse(30,30,30,30);
+				triangle(freeFud[i].cX, freeFud[i].cY + triScale,
+					freeFud[i].cX - triScale, freeFud[i].cY - triScale/2,
+					freeFud[i].cX + triScale, freeFud[i].cY - triScale/2);
+			}
 		}
-		else {
-			fill(0);
-		}
-		noStroke();
-		text('me', atman.x, atman.y + 5);
 
 		var data = {
 			x: atman.x,
 			y: atman.y,
 			t: tato,
 			m: mork,
-			u: upple
+			u: upple,
+			tile: atman.tile
 		};
 		socket.emit('update', data);
 
@@ -207,6 +255,12 @@ function draw() {
 				oneTrade = false;
 			}
 		}
+
+		socket.on('fudCheck',
+			function(data){
+				freeFud = data;
+			}
+		);
 
 		socket.on('trade',
 			function(data){
@@ -245,6 +299,8 @@ function draw() {
 	}
 }
 
+//alphabetize functions? where do socket functions go?
+
 function mousePressed(){
 	// console.log(slots);
 	for (var i = atmans.length - 1; i >=0; i--){
@@ -254,6 +310,10 @@ function mousePressed(){
 					if (atmans[i].id !== socket.id){
 						tradeTarget = atmans[i].name;
 						tradeId = atmans[i].id;
+						if(!oneTrade){
+							tradeButt.remove();
+						}
+						oneTrade = true;
 						// console.log(tradeId);
 					}
 		}
@@ -264,16 +324,54 @@ function mouseDragged(){
 //need to toggle so only during game, not setup?
 	for (var i = atmans.length -1; i >= 0; i--){ //could be fun if they're repelling away from items
 		if (socket.id !== atmans[i].id){
-			if (dist(mouseX, mouseY, atmans[i].x, atmans[i].y) > 100){ //why isn't this working anymore?
+			if ((dist(mouseX, mouseY, atmans[i].x, atmans[i].y) > 100)
+				&& (mouseX >= 50 && mouseX <= width-50)
+				&& (mouseY >= 50 && mouseY <= height-50)){ //why isn't this working anymore?
 				atman.x = mouseX;
 				atman.y = mouseY;
 				atman.show();
 			}
 		}
 	}
+	for(var i = freeFud.length -1; i >= 0; i--){
+			atman.x = mouseX;
+			atman.y = mouseY;
+			atman.show();
+		if(freeFud[i].tile == atman.tile){
+			if((dist(mouseX, mouseY, freeFud[i].cX, freeFud[i].cY)) < 10){
+				tato += freeFud[i].t;
+				mork += freeFud[i].m;
+				upple += freeFud[i].u;
+				freeFud.splice(i, 1);
+				socket.emit('eat', freeFud);
+				buttonRefresh();
+			}
+		}
+	}
 }
 
-function Atman(id, x, y, name, r, g, b){
+function Fud(tile, cX, cY, r, g, b, t, m, u){
+  this.tile = tile;
+	this.cX = cX;
+	this.cY = cy;
+  this.r = r;
+  this.g = g;
+  this.b = b;
+  this.t = t;
+  this.m = m;
+  this.u = u;
+
+  this.show = function(){
+		// noStroke();
+		// fill(this.r, this.g, this.b);
+		// ellipse(30,30,30,30);
+		// triangle(this.cX, this.cY + triScale,
+		// 	this.cX - triScale, this.cY - triScale/2,
+		// 	this.cX + triScale, this.cY - triScale/2);
+  }
+}
+
+function Atman(id, x, y, name, r, g, b, tile){
   this.id = id;
 	this.x = x;
   this.y = y;
@@ -281,8 +379,7 @@ function Atman(id, x, y, name, r, g, b){
 	this.r = r;
 	this.g = g;
 	this.b = b;
-	// this.col = color(r, g, b);
-	// this.select = false;
+	this.tile = tile;
 
   this.show = function(){
 		// if (this.select){
@@ -310,6 +407,17 @@ function playerName(){ //for faster debugging
 
 }
 
+function meName(){
+	textSize(18);
+	if (((atman.r + atman.g + atman.b) / 3) < 100){
+		fill(255);
+	}
+	else {
+		fill(0);
+	}
+	noStroke();
+	text('me', atman.x, atman.y + 5);
+}
 function colorPush(){
 	redCol = redSlide.value();
 	greenCol = greenSlide.value();
@@ -329,23 +437,94 @@ function hideDom(){ //all but start
 }
 
 function newPlayer(){
-	atman = new Atman (socket.id, random(50, width - 50), random(50, height-50),
-	 name, redCol, greenCol, blueCol);
-	 console.log(redCol);
-	var data = {
-		id: atman.id,
-		x: atman.x,
-		y: atman.y,
-		name: atman.name,
-		r: redCol,
-		g: greenCol,
-		b: blueCol
-	};
-	socket.emit('start', data);
-	console.log(data);
+	atman = new Atman (socket.id, random(60, width - 60), random(60, height-60),
+	 name, redCol, greenCol, blueCol, int(random(9)));
+	// var data = {
+	// 	id: atman.id,
+	// 	x: atman.x,
+	// 	y: atman.y,
+	// 	name: atman.name,
+	// 	r: redCol,
+	// 	g: greenCol,
+	// 	b: blueCol,
+	// 	tile: atman.tile
+	// };
+	//could have just emit atman huh....
+	socket.emit('start', atman);
+	console.log(atman);
 	joined = true;
 	startButt.hide();
 }
+
+
+function moveButtons(){
+	upButt.remove();
+	downButt.remove();
+	leftButt.remove();
+	rightButt.remove();
+	var tile = atman.tile;
+	//up
+	if(tile - 3 >= 0){
+		upButt = createButton('up');
+		upButt.parent('myCanvas');
+		upButt.position(width/2, height/20);
+		upButt.mousePressed(moveUp);
+	}
+	//down
+	if(tile + 3 <= 8){
+		downButt = createButton('down');
+		downButt.parent('myCanvas');
+		downButt.position(width/2, height - height/20);
+		downButt.mousePressed(moveDown);
+	}
+	//left
+	if((tile - 1 >= 0)&&(tile != 3)&&(tile != 6)){
+		leftButt = createButton('left');
+		leftButt.parent('myCanvas');
+		leftButt.position(width/20, height/2);
+		leftButt.mousePressed(moveLeft);
+	}
+	//right
+	if((tile + 1 <= 8)&&(tile != 2)&&(tile != 5)){
+		rightButt = createButton('right');
+		rightButt.parent('myCanvas');
+		rightButt.position(width - width/20, height/2);
+		rightButt.mousePressed(moveRight);
+	}
+}
+
+function moveUp(){
+	atman.tile -= 3;
+	moveButtons();
+}
+function moveDown(){
+	atman.tile += 3;
+	moveButtons();
+}
+function moveLeft(){
+	atman.tile -= 1;
+	moveButtons();
+}
+function moveRight(){
+	atman.tile += 1;
+	moveButtons();
+}
+// function Tile(x,y,w,h,r,g,b){
+//   this.x = x;
+//   this.y = y;
+//   this.w = w;
+//   this.h = h;
+//   this.r = r;
+//   this.g = g;
+//   this.b = b;
+//
+//   this.show = function(){
+//     strokeWeight(1);
+//     stroke(0);
+//     fill(this.r, this.g, this.b);
+//     rect(this.x, this.y, this.w, this.h);
+//   }
+// }
 
 function trade(){
 	tato -= tato4u;
