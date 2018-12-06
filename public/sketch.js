@@ -459,8 +459,8 @@ function newPlayer(){
 
 
 function moveButtons(){
-	var buttTime = millis();
-	if(buttTime - lastButt >= debounce){ //mobile mouse jumpy fix?
+	// var buttTime = millis();
+	// if(buttTime - lastButt >= debounce){ //mobile mouse jumpy fix?
 		upButt.remove();
 		downButt.remove();
 		leftButt.remove();
@@ -494,8 +494,8 @@ function moveButtons(){
 			rightButt.position(width - width/20, height/2);
 			rightButt.mousePressed(moveRight);
 		}
-		lastButt = millis();
-	}
+		// lastButt = millis();
+	// }
 }
 
 function moveUp(){
