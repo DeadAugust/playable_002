@@ -185,7 +185,7 @@ io.sockets.on('connection',
       function(){
         if(oneGame){
           socket.broadcast.emit('gameOverC'); //just testing client vs main
-          console.log(atmanRanks);
+          // console.log(atmanRanks);
           fudMath();
           for (var i = atmans.length - 1; i >= 0; i--){
             var myTatoPts, myMorkPts, myUpplePts, myPts;
@@ -199,15 +199,15 @@ io.sockets.on('connection',
             }
             atmanRanks.push(endman);
           }
-          console.log(atmanRanks + "2");
+          // console.log(atmanRanks + "2");
 
           // console.log(atmanRanks);
           rankSort();
           // console.log(atmanRanks);
-          console.log(atmanRanks + "3");
+          // console.log(atmanRanks + "3");
 
           io.to(sharedScreenId).emit('finalScores', atmanRanks);
-          console.log(atmanRanks+ "4");
+          // console.log(atmanRanks+ "4");
           oneGame = false;
         }
       }
