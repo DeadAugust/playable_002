@@ -30,7 +30,7 @@ app.use(express.static('public'));
 http.listen(port, function(){
   console.log('listening on ' + port);
 })
-*/
+
 /*
 //for local dev
 var express = require('express');
