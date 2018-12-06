@@ -5,10 +5,12 @@ function Atman(id, x, y, name, r, g, b){
   this.x = x;
   this.y = y;
   this.name = name;
-  // this.col = col;
   this.r = r;
   this.g = g;
   this.b = b;
+  this.t;
+  this.m;
+  this.u;
 }
  // uncomment for heroku
 // shiffman heroku set up &&
@@ -38,25 +40,10 @@ app.use(express.static('public'));
 console.log('Socket server running');
 
 var io = require('socket.io')(server);
-*/
-//new
-// app.get('/sample', function(req,res){
-//   res.send('this sampless');
-// });
-/*
-var router = express.Router();
-
-router.get('/', function(req, res){
-  res.sendFile('/sketch.js');
-});
-
-router.get('/sharedScreen', function(req,res){
-  res.sendFile('/sharedScreen.js');
-});
-
-app.use('/',router);
+// var shared = io.of('/sharedScreen')
 */
 
+//new -- use for both
 var path = require('path');
 
 app.get('/', function(req, res){
@@ -72,11 +59,18 @@ function heartbeat(){ //so this is the only thing sent from server???
   io.sockets.emit('heartbeat', atmans);
 }
 
-//
+//- - - - - - - game states
 var startGame = false; //whether or not game has started
 // var time
 
 
+//- - - - - - overall fud counts + points
+var totalTatos, totalMorks, totalUpples, totalFud; //across whole game
+var pointScale = 200; //points
+var tatoPts, morkPts, upplePts;//end game value percentage for each fud type
+var tatoRank, morkRank, uppleRank;//negative flip if middle rank
+
+// - - - - - - - events
 io.sockets.on('connection',
   function(socket){
     console.log("new player: " + socket.id);
@@ -95,18 +89,32 @@ io.sockets.on('connection',
         console.log(startGame);
       })
 
-    socket.on('update', //x undefined error from being first to party?
+    socket.on('update',
       function(data){
-        // console.log(atmans.length);
         if (atmans.length >= 2){ //so only starts if at least 2 players?
           var atman;
+          totalTatos = 0;
+          totalMorks = 0;
+          totalUpples = 0;
+          totalFud = 0;
           for (var i = 0; i < atmans.length; i++){
             if (socket.id == atmans[i].id){
-              atman = atmans[i];
+              atman = atmans[i]; //why in front?
               atman.x = data.x;
-              atman.y = data.y
+              atman.y = data.y;
+              atman.t = data.t;
+              atman.m = data.m;
+              atman.u = data.u;
             }
+            totalTatos += atmans[i].t;
+            totalMorks += atmans[i].m;
+            totalUpples += atmans[i].u;
           }
+          totalFud = totalTatos + totalMorks + totalUpples;
+          // console.log(totalFud, totalTatos, totalMorks, totalUpples);
+          rank();
+          console.log(tatoRank, morkRank, uppleRank);
+
         }
       }
     );
@@ -125,6 +133,27 @@ io.sockets.on('connection',
         }
       }
     );
+
+    socket.on('rankCheck?',
+      function(data){
+        var data = {
+          tRank: tatoRank,
+          mRank: morkRank,
+          uRank: uppleRank
+        }
+        console.log('rankCheck ' + socket.id);
+        io.to(socket.id).emit('rankCheck', data);
+        // socket.broadcast.to(socket.id).emit('rankCheck', data); //broadcast bad?
+      }
+    );
+
+    socket.on('gameOver',
+      function(){
+        socket.broadcast.emit('gameOverC'); //just testing client vs main
+        fudMath();
+      }
+    );
+
     socket.on('disconnect',
       function(data){
         var atman;
@@ -133,7 +162,43 @@ io.sockets.on('connection',
             atmans.splice(i, 1);
           }
         }
-
         console.log("Client has disconnected");
-      })
-  })
+      }
+    );
+  }
+)
+
+//- - - - - - - in-game fud ranking //if even at start, no bad?
+function rank(){
+  if (((totalTatos > totalMorks) || (totalTatos > totalUpples))
+    && ((totalTatos < totalMorks) || (totalTatos < totalUpples))){
+      tatoRank = -1;
+      morkRank = 1;
+      uppleRank = 1;
+    }
+  else if (((totalMorks > totalTatos) || (totalMorks > totalUpples))
+    && ((totalMorks < totalTatos) || (totalMorks < totalUpples))){ //else if?
+      tatoRank = 1;
+      morkRank = -1;
+      uppleRank = 1;
+    }
+  else if (((totalUpples > totalTatos) || (totalUpples > totalMorks))
+    && ((totalUpples < totalTatos) || (totalUpples < totalMorks))){ //else if?
+      tatoRank = 1;
+      morkRank = 1;
+      uppleRank = -1;
+    }
+  else{
+    console.log('rank bumb'); //meaningless test
+    }
+  }
+
+
+
+// - - - - - - fud math at end
+function fudMath(){
+  totalFud = totalTatos + totalMorks + totalUpples;
+  tatoPts = totalTatos / totalFud * pointScale * tatoRank;
+  morkPts = totalMorks / totalFud * pointScale * morkRank;
+  upplePts = totalUpples / totalFud * pointScale * uppleRank;
+}

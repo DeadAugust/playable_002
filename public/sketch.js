@@ -1,5 +1,4 @@
-//var socket;
-var socket = io(); // I think this is what did it
+var socket = io();
 
 var atman;
 var atmans = [];
@@ -45,12 +44,14 @@ var debounce = 500;
 //- - - - - - - - map
 var slots = []; //nested array?
 
+//- - - - - - - - game over
+var gameOver = false; //if time's up
+
 function setup(){
 	//- - - - - overall
 	var screenSize = windowHeight - 100;
 	var canvas = createCanvas(int(screenSize * .666), screenSize);
  	canvas.parent('myCanvas');
-	// bgColor = color(0, 150, 50); //should have same bg I guess
 	background(0, 150, 50);
 	textAlign(CENTER);
 
@@ -145,8 +146,13 @@ function draw() {
 		upples.mousePressed(tradeUpple);
 		gameSetup = true;
 	}
-	else{ //- - - - - after setup
-		// startButt.hide();
+	else if(gameOver){
+		background(100, 0, 40);
+		textSize(40);
+		fill(0);
+		text('times up!', width/2, height/2);
+	}
+	else{ //- - - - - after setup, main game
 		background(0, 150, 50); //where can I put this?
 		if (tradeMsg){
 			stroke(255);
@@ -188,6 +194,9 @@ function draw() {
 		var data = {
 			x: atman.x,
 			y: atman.y,
+			t: tato,
+			m: mork,
+			u: upple
 		};
 		socket.emit('update', data);
 
@@ -227,6 +236,12 @@ function draw() {
 				}
 			}
 		);
+
+		socket.on('gameOverC',
+			function(){
+				gameOver = true;
+			}
+		);
 	}
 }
 
@@ -249,7 +264,7 @@ function mouseDragged(){
 //need to toggle so only during game, not setup?
 	for (var i = atmans.length -1; i >= 0; i--){ //could be fun if they're repelling away from items
 		if (socket.id !== atmans[i].id){
-			if (dist(mouseX, mouseY, atmans[i].x, atmans[i].y) > 100){
+			if (dist(mouseX, mouseY, atmans[i].x, atmans[i].y) > 100){ //why isn't this working anymore?
 				atman.x = mouseX;
 				atman.y = mouseY;
 				atman.show();
@@ -284,14 +299,14 @@ function Atman(id, x, y, name, r, g, b){
   }
 }
 
-function playerName(){
-	if (name !== 'me' && name !== 'Me' && name !== 'type name here'){
+function playerName(){ //for faster debugging
+	// if (name !== 'me' && name !== 'Me' && name !== 'type name here'){
 		name = input.value();
 		nameYes = true;
-	}
-	else{
-		input.value('please type a different name');
-	}
+	// }
+	// else{
+		// input.value('please type a different name');
+	// }
 
 }
 
@@ -326,7 +341,6 @@ function newPlayer(){
 		g: greenCol,
 		b: blueCol
 	};
-
 	socket.emit('start', data);
 	console.log(data);
 	joined = true;
@@ -366,9 +380,6 @@ function trade(){
 	lastTrader = data.nameTo;
 }
 
-// function showTrade(){
-// 	if (tato4u)
-// }
 function buttonRefresh(){
 	tatos.remove();
 	morks.remove();
@@ -380,6 +391,7 @@ function buttonRefresh(){
 	upples = createButton('upples:' + upple);
 	upples.mousePressed(tradeUpple);
 }
+
 function resetTrade(){
 	tradeFud = ' ';
 	oneTrade = true;
