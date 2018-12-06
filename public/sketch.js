@@ -40,7 +40,8 @@ var upple4u = 0;
 var oneTrade = true; //trade debounce;
 var tradeTime = 1000;// for trade
 var lastTrade = 0;
-var debounce = 500;
+var lastButt = 0;
+var debounce = 800;
 
 var tatoCol;
 var morkCol;
@@ -458,38 +459,42 @@ function newPlayer(){
 
 
 function moveButtons(){
-	upButt.remove();
-	downButt.remove();
-	leftButt.remove();
-	rightButt.remove();
-	var tile = atman.tile;
-	//up
-	if(tile - 3 >= 0){
-		upButt = createButton('up');
-		upButt.parent('myCanvas');
-		upButt.position(width/2, height/20);
-		upButt.mousePressed(moveUp);
-	}
-	//down
-	if(tile + 3 <= 8){
-		downButt = createButton('down');
-		downButt.parent('myCanvas');
-		downButt.position(width/2, height - height/20);
-		downButt.mousePressed(moveDown);
-	}
-	//left
-	if((tile - 1 >= 0)&&(tile != 3)&&(tile != 6)){
-		leftButt = createButton('left');
-		leftButt.parent('myCanvas');
-		leftButt.position(width/20, height/2);
-		leftButt.mousePressed(moveLeft);
-	}
-	//right
-	if((tile + 1 <= 8)&&(tile != 2)&&(tile != 5)){
-		rightButt = createButton('right');
-		rightButt.parent('myCanvas');
-		rightButt.position(width - width/20, height/2);
-		rightButt.mousePressed(moveRight);
+	var buttTime = millis();
+	if(buttTime - lastButt >= debounce){ //mobile mouse jumpy fix?
+		upButt.remove();
+		downButt.remove();
+		leftButt.remove();
+		rightButt.remove();
+		var tile = atman.tile;
+		//up
+		if(tile - 3 >= 0){
+			upButt = createButton('up');
+			upButt.parent('myCanvas');
+			upButt.position(width/2, height/20);
+			upButt.mousePressed(moveUp);
+		}
+		//down
+		if(tile + 3 <= 8){
+			downButt = createButton('down');
+			downButt.parent('myCanvas');
+			downButt.position(width/2, height - height/20);
+			downButt.mousePressed(moveDown);
+		}
+		//left
+		if((tile - 1 >= 0)&&(tile != 3)&&(tile != 6)){
+			leftButt = createButton('left');
+			leftButt.parent('myCanvas');
+			leftButt.position(width/20, height/2);
+			leftButt.mousePressed(moveLeft);
+		}
+		//right
+		if((tile + 1 <= 8)&&(tile != 2)&&(tile != 5)){
+			rightButt = createButton('right');
+			rightButt.parent('myCanvas');
+			rightButt.position(width - width/20, height/2);
+			rightButt.mousePressed(moveRight);
+		}
+		lastButt = millis();
 	}
 }
 

@@ -40,6 +40,8 @@ function setup(){
   textSize(height/10);
   background(0,150,50);
   startButton = createButton('start Game');
+  startButton.parent('myCanvas');
+  startButton.position(4* width/5, height/8);
   startButton.mousePressed(startGame);
 
   //map
@@ -236,7 +238,21 @@ function draw (){
       function(data){
         atmanRanks = data;
         finalScores = true;
-      })
+      }
+    );
+  }
+  else{ //loading dock waiting screen
+    background(51, 204, 51);
+    noStroke();
+    fill(0, 102, 153);
+    textSize(height/8);
+    text('Players:', width/2, height/8);
+    textSize(height/(8 + atmans.length));
+    hLine = (height-100)/(atmans.length + 1);
+    for(var i = 0; i < atmans.length; i++){
+      fill(atmans[i].r, atmans[i].g, atmans[i].b);
+      text(atmans[i].name, width/2, ((i+1) * hLine) + 100);
+    }
   }
 }
 
