@@ -68,6 +68,7 @@ function heartbeat(){ //so this is the only thing sent from server???
 
 //- - - - - - - game states
 var startGame = false; //whether or not game has started
+var oneGame = true; //attempt at stopping score screen spam
 // var time
 
 var sharedScreenId;
@@ -182,31 +183,33 @@ io.sockets.on('connection',
 
     socket.on('gameOver',
       function(){
-        socket.broadcast.emit('gameOverC'); //just testing client vs main
-        console.log(atmanRanks);
-        fudMath();
-        for (var i = atmans.length - 1; i >= 0; i--){
-          var myTatoPts, myMorkPts, myUpplePts, myPts;
-          myTatoPts = atmans[i].t * tatoPts;
-          myMorkPts = atmans[i].m * morkPts;
-          myUpplePts = atmans[i].u * upplePts;
-          myPts = myTatoPts + myMorkPts + myUpplePts;
-          var endman = {
-            name: atmans[i].name,
-            pts: myPts
+        if(oneGame){
+          socket.broadcast.emit('gameOverC'); //just testing client vs main
+          console.log(atmanRanks);
+          fudMath();
+          for (var i = atmans.length - 1; i >= 0; i--){
+            var myTatoPts, myMorkPts, myUpplePts, myPts;
+            myTatoPts = atmans[i].t * tatoPts;
+            myMorkPts = atmans[i].m * morkPts;
+            myUpplePts = atmans[i].u * upplePts;
+            myPts = myTatoPts + myMorkPts + myUpplePts;
+            var endman = {
+              name: atmans[i].name,
+              pts: myPts
+            }
+            atmanRanks.push(endman);
           }
-          atmanRanks.push(endman);
+          console.log(atmanRanks + "2");
+
+          // console.log(atmanRanks);
+          rankSort();
+          // console.log(atmanRanks);
+          console.log(atmanRanks + "3");
+
+          io.to(sharedScreenId).emit('finalScores', atmanRanks);
+          console.log(atmanRanks+ "4");
+          oneGame = false;
         }
-        console.log(atmanRanks + "2");
-
-        // console.log(atmanRanks);
-        rankSort();
-        // console.log(atmanRanks);
-        console.log(atmanRanks + "3");
-
-        io.to(sharedScreenId).emit('finalScores', atmanRanks);
-        console.log(atmanRanks+ "4");
-
       }
     );
 
