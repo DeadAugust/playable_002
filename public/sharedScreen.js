@@ -10,8 +10,8 @@ var freeFud = [];
 
 //- - - - - - - timer
 var startTime = false; //timer on/off
-var timeLimit = 80000; //test timer
-// var timeLimit = 120000; //two mins per round
+// var timeLimit = 80000; //test timer
+var timeLimit = 120000; //two mins per round
 var timer; //millis tracker
 var clock; //countdown display
 var clockMin;

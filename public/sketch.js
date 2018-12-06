@@ -397,15 +397,15 @@ function Atman(id, x, y, name, r, g, b, tile){
   }
 }
 
-function playerName(){ //for faster debugging
-	// if (name !== 'me' && name !== 'Me' && name !== 'type name here'){
+function playerName(){ //for faster debugging remove
+	if (name !== 'me' && name !== 'Me' && name !== 'type name here'
+		&& name !== 'please type a different name'){
 		name = input.value();
 		nameYes = true;
-	// }
-	// else{
-		// input.value('please type a different name');
-	// }
-
+	}
+	else{
+		input.value('please type a different name');
+	}
 }
 
 function meName(){
