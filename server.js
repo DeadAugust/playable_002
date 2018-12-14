@@ -51,7 +51,8 @@ console.log('Socket server running');
 var io = require('socket.io')(server);
 // var shared = io.of('/sharedScreen')
 */
-//new
+
+//new fix
 var path = require('path');
 
 app.get('/', function(req, res){
@@ -63,11 +64,11 @@ app.get('/sharedScreen', function(req,res){
 });
 
 setInterval(heartbeat, 33);
-function heartbeat(){ //so this is the only thing sent from server???
+function heartbeat(){
   var data = {
     atmans: atmans,
     mapTiles: mapTiles,
-    freeFud: freeFud
+    freeFud: freeFud // need?
   }
   io.sockets.emit('heartbeat', data);
 }
@@ -76,9 +77,7 @@ function heartbeat(){ //so this is the only thing sent from server???
 var startGame = false; //whether or not game has started
 var oneGame = true; //attempt at stopping score screen spam
 
-// var time
-
-var sharedScreenId;
+var sharedScreenId; //?
 
 //- - - - - - overall fud counts + points
 var totalTatos, totalMorks, totalUpples, totalFud; //across whole game
@@ -86,6 +85,7 @@ var pointScale = 200; //points
 var tatoPts, morkPts, upplePts;//end game value percentage for each fud type
 var tatoRank, morkRank, uppleRank;//negative flip if middle rank
 var atmanRanks = []; //final score rankings
+
 // - - - - - - - events
 io.sockets.on('connection',
   function(socket){
@@ -182,7 +182,6 @@ io.sockets.on('connection',
           mRank: morkRank,
           uRank: uppleRank
         }
-        // console.log('rankCheck ' + socket.id);
         io.to(sharedScreenId).emit('rankCheck', data);
         // socket.broadcast.to(socket.id).emit('rankCheck', data); //broadcast bad?
       }
@@ -205,9 +204,7 @@ io.sockets.on('connection',
             }
             atmanRanks.push(endman);
           }
-          // console.log(atmanRanks);
           rankSort();
-          // console.log(atmanRanks);
           io.to(sharedScreenId).emit('finalScores', atmanRanks);
           oneGame = false;
         }
@@ -259,7 +256,6 @@ function rank(){
     tatoRank = 1;
     morkRank = 2;
     uppleRank = -1;
-    // console.log('rank bumb'); //meaningless test
     }
   }
 
@@ -272,6 +268,7 @@ function fudMath(){
   morkPts = Math.floor(totalMorks / totalFud * pointScale * morkRank);
   upplePts = Math.floor(totalUpples / totalFud * pointScale * uppleRank);
 }
+
 //- - - - - - winner rankings
 function rankSort(){
   /* //so sad this didn't work
@@ -289,11 +286,3 @@ function rankSort(){
     return b.pts - a.pts;
   });
 }
-
-// function scoreBoard(){
-//
-//   for (var i = 0; i < atmanRanks.length; i++){
-//     var hLine =
-//     text
-//   }
-// }

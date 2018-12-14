@@ -11,7 +11,6 @@ var startButton;
 var atmans = [];
 //- - - - - - - - map
 var mapTiles = [];
-// var mapNames = [];
 var freeFud = [];
 
 //- - - - - - - timer
@@ -94,12 +93,7 @@ socket.emit('startMap', mapTiles);
 function draw (){
   // background(20, 200, 100); //sandbox start where all avatars are?
   if(finalScores){
-    // textSize(height/10);
     background(51, 204, 51);
-    // strokeWeight(4);
-    // stroke(255);
-    // fill(0);
-    // text("0:00", 5 * width/6, height/7);
     noStroke();
     fill(0, 102, 153);
     textSize(height/8);
@@ -114,8 +108,6 @@ function draw (){
   }
   else if(startTime){
     //map
-
-    // textSize(height/10);
     background(0,150,50);
     rectMode(CORNER);
     textSize(height/(14 + atmans.length));
@@ -124,7 +116,6 @@ function draw (){
       mapTiles[i].nameCount = 1;
       for (var j = atmans.length -1; j >= 0; j--){
         if(atmans[j].tile == i){
-          // console.log('daidfidfidf');
           fill(atmans[j].r, atmans[j].g, atmans[j].b);
           mapTiles[i].gps(atmans[j].name);
         }
@@ -236,7 +227,6 @@ function draw (){
           goodMorks = false;
           goodUpples = true;
         }
-        // console.log('rankkkkkk');
       }
     );
 
@@ -341,8 +331,4 @@ function Fud(tile, cX, cY, r, g, b, t, m, u){
   this.t = t;
   this.m = m;
   this.u = u;
-
-  // this.show = function(){
-  //
-  // }
 }

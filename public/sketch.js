@@ -1,4 +1,4 @@
-/* Tradetatos 
+/* Tradetatos
 a mobile game demo by August Luhrs
 for ITP's ICM final project
 huge thanks to Allison Parrish, Dan Shiffman, and Shawn Van Every
@@ -10,7 +10,6 @@ var atmans = [];
 var mapTiles = [];
 var freeFud = [];
 
-// var bgColor;
 //- - - - - player setup
 var input, submit, redSlide, greenSlide, blueSlide, colorChoose, startButt;
 var name = ' ';
@@ -28,7 +27,6 @@ var gameSetup = false; //game setup after player creation UGH "setup"
 var tradeTarget = ' '; // player selected
 var tradeId; //player's id
 var tradeFud = ' '; // item selected
-// var tradeCan = false; //if both above are true, can trade
 var tradeButt; //trade button
 var tradeMsg = false; //for msg overlay
 var lastTrader; //person last traded with
@@ -42,8 +40,8 @@ var tato4u = 0;
 var mork4u = 0;
 var upple4u = 0;
 //debounce
-var oneTrade = true; //trade debounce;
-var tradeTime = 1000;// for trade
+var oneTrade = true;
+var tradeTime = 1000;
 var lastTrade = 0;
 var lastButt = 0;
 var debounce = 800;
@@ -55,9 +53,8 @@ var uppleCol;
 var triScale = 20; //fud triangle scaling
 
 //- - - - - - - - map
-// var slots = []; //nested array?
-
 var upButt, downButt, leftButt, rightButt; //movement
+
 //- - - - - - - - game over
 var gameOver = false; //if time's up
 
@@ -107,17 +104,6 @@ function setup(){
 	var tatoCol = color(255,253,0,50);
 	var morkCol = color(0,51,153,50);
 	var uppleCol = color(179,0,89,50);
-
-	//map slots -- 20
-	// for (var y = 0; y < 5; y++){
-	// 	slots[y] = [];
-	// 	for (var x = 0; x < 4; x ++){
-	// 		slots[y][x] = {
-	// 			x: x * width/5,
-	// 			y: y * height/6
-	// 		}
-	// 	}
-	// }
 
 	// - - - - - heartbeat
 	socket.on('heartbeat',
@@ -190,7 +176,6 @@ function draw() {
 		text('times up!', width/2, height/2);
 	}
 	else{ //- - - - - after setup, main game
-		// background(0, 150, 50); //where can I put this?
 		background(mapTiles[atman.tile].r,mapTiles[atman.tile].g,mapTiles[atman.tile].b)
 		if (tradeMsg){
 			stroke(255);
@@ -200,6 +185,7 @@ function draw() {
 			text("You traded with " + lastTrader, width/2, height/2);
 		}
 		console.log(tradeMsg);
+
 		//update map
 		for (var i = atmans.length - 1; i >= 0; i--){
 			var id = atmans[i].id;
@@ -220,15 +206,6 @@ function draw() {
 		}
 		atman.show();
 		meName();
-		// textSize(18);
-		// if (((atman.r + atman.g + atman.b) / 3) < 100){
-		// 	fill(255);
-		// }
-		// else {
-		// 	fill(0);
-		// }
-		// noStroke();
-		// text('me', atman.x, atman.y + 5);
 
 		//fud pick up and map display
 		console.log(freeFud);
@@ -280,7 +257,7 @@ function draw() {
 					strokeWeight(2);
 					fill(255, 200);
 					textSize(22);
-					if (data.idTato == 1){ //make individual functions, toggle, loop text
+					if (data.idTato == 1){
 						text(data.nameFrom + " sent you a Tato", width/2, height/2);
 					}
 					else if (data.idMork == 1){
@@ -388,14 +365,6 @@ function Atman(id, x, y, name, r, g, b, tile){
 	this.tile = tile;
 
   this.show = function(){
-		// if (this.select){
-		// 	stroke(255,255,0);
-		// 	strokeWeight(6);
-		// }
-		// else{
-		// 	stroke(0);
-		// 	strokeWeight(3);
-		// }
 		noStroke();
     fill(this.r, this.g, this.b);
     ellipse(this.x, this.y, 40, 40);
@@ -424,6 +393,7 @@ function meName(){
 	noStroke();
 	text('me', atman.x, atman.y + 5);
 }
+
 function colorPush(){
 	redCol = redSlide.value();
 	greenCol = greenSlide.value();
@@ -519,22 +489,6 @@ function moveRight(){
 	atman.tile += 1;
 	moveButtons();
 }
-// function Tile(x,y,w,h,r,g,b){
-//   this.x = x;
-//   this.y = y;
-//   this.w = w;
-//   this.h = h;
-//   this.r = r;
-//   this.g = g;
-//   this.b = b;
-//
-//   this.show = function(){
-//     strokeWeight(1);
-//     stroke(0);
-//     fill(this.r, this.g, this.b);
-//     rect(this.x, this.y, this.w, this.h);
-//   }
-// }
 
 function trade(){
 	tato -= tato4u;
